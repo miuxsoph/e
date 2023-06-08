@@ -268,12 +268,13 @@ $(function () {
     });
 });
 
-// JavaScript code here
+JavaScript code here
     $(document).ready(function() {
       $("#invertBtn").click(function() {
         var bitString = $("#bitArea").val(); // Get the bit string from the input field
         var invertedString = invertColors(bitString); // Invert the colors using the invertColors function
         $("#bitArea").val(invertedString); // Update the input field with the inverted string
+        setBitString(invertedString); // Update the bit string in the logic
         setBitMap(); // Update the grid visualization
       });
 
@@ -292,6 +293,8 @@ $(function () {
         return invertedStr;
       }
     });
+
+
 
 
 var units = new Array("one", "two", "three", "four", "five", "six", "seven", "eight", "nine");
