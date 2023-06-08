@@ -281,16 +281,7 @@ function compress() {
     return result;
   }
 
-  document.getElementById('out').value =
-    'Public Key: 3v' +
-    findRepeat(str).join('') +
-    '\n\nView Key: 6v' +
-    compressedImg +
-    '\n\nPriv Key: #' +
-    btoa(jimmy.join('')) +
-    '\n\nMaster Key: Mv#' +
-    btoa(compressedImg2) +
-    '\n\n';
+  document.getElementById('out').value = findRepeat(str).join('');
 
   document.getElementById('inp').value = '';
 }
