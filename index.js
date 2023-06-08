@@ -280,14 +280,14 @@ function compress() {
     });
     return result;
   }
-
+   $('#out').val(compressedIMG)
   document.getElementById('out').value = findRepeat(str).join('');
 
   document.getElementById('inp').value = '';
 }
 
 function restore() {
-  var compressedImgCur1 = document.getElementById('out').value.replace('Mv#', '');
+  var compressedImgCur1 = document.getElementById('out').value.replace('');
   var compressedImgCur = atob(compressedImgCur1);
   let decompressedImgCur = compressedImgCur
     .split('')
