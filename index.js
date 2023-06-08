@@ -260,7 +260,7 @@ $(function () {
                 setBitMap();
                 setPresetUrl();
             }
-        }, 0.5);
+        }, 0);
     });
 
     $('#stopBtn').click(function () {
