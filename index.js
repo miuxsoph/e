@@ -236,13 +236,36 @@ function setPresetUrl() {
     window.history.replaceState({}, document.title, url.href);
 }
 
-// Shorthand for $( document ).ready()
+// // Shorthand for $( document ).ready()
 $(function () {
     const searchParams = new URLSearchParams(window.location.search);
     const base62 = searchParams.get('preset');
     if (base62 !== null) {
         loadBase62Preset(base62);
     }
+
+    var intervalId;
+
+    $('#startBtn').click(function () {
+        var decValue = new BigNumber($('#decArea').val());
+        var maxDecValue = new BigNumber('17').times(new BigNumber('2').exponentiatedBy(1802));
+
+        intervalId = setInterval(function () {
+            decValue = decValue.plus(17);
+            if (decValue.isGreaterThan(maxDecValue)) {
+                clearInterval(intervalId);
+            } else {
+                setDecString(decValue);
+                setBitString(decValue.dividedBy(17).integerValue(BigNumber.ROUND_FLOOR).toString(2).padStart(1802, '0'));
+                setBitMap();
+                setPresetUrl();
+            }
+        }, 500);
+    });
+
+    $('#stopBtn').click(function () {
+        clearInterval(intervalId);
+    });
 });
 
 var units = new Array("one", "two", "three", "four", "five", "six", "seven", "eight", "nine");
@@ -338,23 +361,7 @@ function toWordsConverted(string) {
 }
 
 
-        // Add event listener to the increment button
-        $(document).ready(function () {
-            $('#incrementBtn').click(function () {
-                var presetValue = new BigNumber($('#decArea').val());
-                var increment = new BigNumber(17);
-                var newValue = presetValue.plus(increment);
-
-                $('#decArea').val(newValue.toString());
-                $('#bitArea').val(newValue.dividedBy(17).integerValue().toString(2).padStart(1802, '0'));
-
-                // Call the necessary functions to update the display
-                setBitMap();
-                convertToWords(newValue.toFixed());
-                setPresetUrl();
-            });
-        });
- 
+       
 
 
 
