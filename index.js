@@ -269,30 +269,7 @@ $(function () {
 });
 
 
-    $(document).ready(function() {
-      $("#invertBtn").click(function() {
-        var bitString = $("#bitArea").val(); // Get the bit string from the input field
-        var invertedString = invertColors(bitString); // Invert the colors using the invertColors function
-        $("#bitArea").val(invertedString); // Update the input field with the inverted string
-        setBitString(invertedString); // Update the bit string in the logic
-        setBitMap(); // Update the grid visualization
-      });
 
-      // Function to invert the colors
-      function invertColors(str) {
-        var invertedStr = "";
-        for (var i = 0; i < str.length; i++) {
-          if (str[i] === "0") {
-            invertedStr += "1";
-          } else if (str[i] === "1") {
-            invertedStr += "0";
-          } else {
-            invertedStr += str[i];
-          }
-        }
-        return invertedStr;
-      }
-    });
 
 
 
