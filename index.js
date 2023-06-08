@@ -268,7 +268,7 @@ $(function () {
     });
 });
 
-JavaScript code here
+
     $(document).ready(function() {
       $("#invertBtn").click(function() {
         var bitString = $("#bitArea").val(); // Get the bit string from the input field
