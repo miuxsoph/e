@@ -223,21 +223,21 @@ function loadBase62Preset(base62String) {
     } catch (error) { }
 }
 
-function setPresetUrl() {
-    const url = new URL(document.location);
-    const params = url.searchParams;
-    BigNumber.config({ ALPHABET: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' });
-    const base62String = decimal.dividedBy(17).toString(62);
-    $('#stringArea').text(base62String);
-    $('#inp').text(base62String);
-    $('#inp').val(base62String);
-    if (base62String !== '0') {
-        params.set('preset', base62String);
-    } else {
-        params.delete('preset');
-    }
-    window.history.replaceState({}, document.title, url.href);
+ function setPresetUrl() {
+  const url = new URL(document.location);
+  const params = url.searchParams;
+  BigNumber.config({ ALPHABET: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' });
+  const base62String = decimal.dividedBy(17).toString(62);
+  $('#stringArea').text(base62String);
+  $('#inp').val(base62String); // Set base62 string in the inp text field
+  if (base62String !== '0') {
+    params.set('preset', base62String);
+  } else {
+    params.delete('preset');
+  }
+  window.history.replaceState({}, document.title, url.href);
 }
+
 
 function compress() {
   var imgCur = document.getElementById('inp').value;
@@ -304,6 +304,33 @@ function restore() {
     .join('');
   document.getElementById('inp').value = decompressedImgCur;
 }
+
+
+
+
+
+
+
+// Add event listeners for URL hash change and grid cell selection
+window.onhashchange = handleHashChange;
+$('#grid-overlay td').mouseup(handleGridCellSelection);
+
+// Function to handle URL hash change
+function handleHashChange() {
+  const searchParams = new URLSearchParams(window.location.search);
+  const base62 = searchParams.get('preset');
+  if (base62 !== null) {
+    loadBase62Preset(base62);
+    compress(); // Automatically compress when URL hash changes
+  }
+}
+
+// Function to handle grid cell selection
+function handleGridCellSelection() {
+  compress(); // Automatically compress when a grid cell is selected
+}
+
+// Rest of the code...
 
 // // Shorthand for $( document ).ready()
 $(function () {
