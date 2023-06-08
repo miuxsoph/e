@@ -268,6 +268,32 @@ $(function () {
     });
 });
 
+// JavaScript code here
+    $(document).ready(function() {
+      $("#invertBtn").click(function() {
+        var bitString = $("#bitArea").val(); // Get the bit string from the input field
+        var invertedString = invertColors(bitString); // Invert the colors using the invertColors function
+        $("#bitArea").val(invertedString); // Update the input field with the inverted string
+        setBitMap(); // Update the grid visualization
+      });
+
+      // Function to invert the colors
+      function invertColors(str) {
+        var invertedStr = "";
+        for (var i = 0; i < str.length; i++) {
+          if (str[i] === "0") {
+            invertedStr += "1";
+          } else if (str[i] === "1") {
+            invertedStr += "0";
+          } else {
+            invertedStr += str[i];
+          }
+        }
+        return invertedStr;
+      }
+    });
+
+
 var units = new Array("one", "two", "three", "four", "five", "six", "seven", "eight", "nine");
 var teens = new Array("ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen ", "nineteen");
 var tens = new Array("twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety");
