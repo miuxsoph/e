@@ -336,3 +336,28 @@ function toWordsConverted(string) {
     r = r.charAt(0).toUpperCase() + r.substring(1, r.length) + ".";
     return r;
 }
+
+
+        // Add event listener to the increment button
+        $(document).ready(function () {
+            $('#incrementBtn').click(function () {
+                var presetValue = new BigNumber($('#decArea').val());
+                var increment = new BigNumber(17);
+                var newValue = presetValue.plus(increment);
+
+                $('#decArea').val(newValue.toString());
+                $('#bitArea').val(newValue.dividedBy(17).integerValue().toString(2).padStart(1802, '0'));
+
+                // Call the necessary functions to update the display
+                setBitMap();
+                convertToWords(newValue.toFixed());
+                setPresetUrl();
+            });
+        });
+ 
+
+
+
+
+
+
