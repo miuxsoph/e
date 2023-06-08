@@ -229,8 +229,8 @@ function loadBase62Preset(base62String) {
   BigNumber.config({ ALPHABET: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' });
   const base62String = decimal.dividedBy(17).toString(62);
   $('#stringArea').text(base62String);
-  $('#inp').val(base62String); // Set base62 string in the inp text field
-  if (base62String !== '0') {
+
+if (base62String !== '0') {
     params.set('preset', base62String);
   } else {
     params.delete('preset');
