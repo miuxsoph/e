@@ -260,50 +260,50 @@ $('#addSavedValueBtn').click(function () {
 });
 
 
-// Modify your existing JavaScript with the following
-
-let valuesArray = [];
-let playInterval;
+var valuesArray = [];
+var playInterval;
 
 function displayError(index, value) {
-    const errorDiv = document.createElement("div");
-    errorDiv.textContent = `Error ${index + 1}: ${intToBase62(value)}`;
-    document.getElementById("errors").appendChild(errorDiv);
+    console.log(`Error ${index + 1}: ${value.toString(62)}`);
 }
 
-document.getElementById("addToArrayBtn").addEventListener("click", function() {
-    // Save the activeValue to the array and display error message
-    valuesArray.push(activeValue);
-    displayError(valuesArray.length - 1, activeValue);
+$('#saveToArrayBtn').click(function () {
+    var currentDecValue = new BigNumber($('#decArea').val());
+    valuesArray.push(currentDecValue);
+    displayError(valuesArray.length - 1, currentDecValue);
 });
 
-document.getElementById("clearOldestBtn").addEventListener("click", function() {
-    // Remove the oldest value from the array and from the errors
-    if (valuesArray.length > 0) {
-        valuesArray.shift();
-        const errorsDiv = document.getElementById("errors");
-        errorsDiv.removeChild(errorsDiv.firstChild);
+$('#displayErrorBtn').click(function () {
+    for (var i = 0; i < valuesArray.length; i++) {
+        displayError(i, valuesArray[i]);
     }
 });
 
-document.getElementById("playBtn").addEventListener("click", function() {
-    // Cycle through the array values on the graph
-    let index = 0;
-    playInterval = setInterval(function() {
+$('#clearOldestValueBtn').click(function () {
+    if (valuesArray.length > 0) {
+        valuesArray.shift();
+    }
+});
+
+$('#playBtn').click(function () {
+    var index = 0;
+    playInterval = setInterval(function () {
         if (index < valuesArray.length) {
-            graph.update(valuesArray[index]);
+            var decValue = valuesArray[index];
+            setDecString(decValue);
+            setBitString(decValue.dividedBy(17).integerValue(BigNumber.ROUND_FLOOR).toString(2).padStart(1802, '0'));
+            setBitMap();
+            setPresetUrl();
             index++;
         } else {
             clearInterval(playInterval);
         }
-    }, 1000);  // Adjust the interval time as necessary
+    }, 2000);  // Change the interval as per your needs
 });
 
-document.getElementById("stopBtn").addEventListener("click", function() {
-    // Stop cycling through the array values
+$('#stopBtn').click(function () {
     clearInterval(playInterval);
 });
-
 
 
 
