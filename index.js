@@ -339,6 +339,27 @@ $(function () {
     });
 });
 
+
+
+document.getElementById("invertBitsButton").addEventListener("click", function() {
+    let bitString = document.getElementById("bitArea").value;
+
+    // Create a new string with inverted bits
+    let invertedBitString = '';
+    for(let i = 0; i < bitString.length; i++){
+        invertedBitString += bitString[i] === '0' ? '1' : '0'; // Flip the bit
+    }
+
+    // Convert inverted bitstring to decimal
+    let invertedDecimal = new BigNumber(invertedBitString, 2).toString(10);
+
+    // Update bitArea with inverted bitstring
+    setBitString(invertedBitString);
+
+    // Set the decimal value to the inverted value and update the grid
+    setDecString(invertedDecimal);
+});
+
 var units = new Array("one", "two", "three", "four", "five", "six", "seven", "eight", "nine");
 var teens = new Array("ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen ", "nineteen");
 var tens = new Array("twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety");
