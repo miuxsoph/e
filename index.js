@@ -194,7 +194,7 @@ $("#presets #netpbm").change(function(evt) {
                     var offsetY = (cols + 1) * (y) * 4;
                     bitString += data[offsetY + offsetX] != 0 ? "0" : "1";
                 }
-            };
+            }; 
             bitError.text("");
             setBitString(bitString);
 
@@ -341,33 +341,30 @@ $(function () {
 
 
 
-$('#invertBitsBtn').click(function() {
-  // Get the current bit string from the input field or wherever it's stored
-  var bitString = $('#bitArea').val(); // Replace with the actual source of the bit string
-  
-  // Invert the bits in the string
-  var invertedBitString = '';
-  for (var k = 0; k < bitString.length; k++) {
-    if (bitString.charAt(k) === '0') {
-      invertedBitString += '1';
-    } else if (bitString.charAt(k) === '1') {
-      invertedBitString += '0';
-    } else {
-      invertedBitString += bitString.charAt(k);
+$('#invertBtn').click(function () {
+    var bitString = $('#bitArea').val(); // Get the current bit string
+    
+    var invertedBitString = '';
+    for (var k = 0; k < bitString.length && k < 1802; k++) {
+        if (bitString.charAt(k) === '0') {
+            invertedBitString += '1';
+        } else if (bitString.charAt(k) === '1') {
+            invertedBitString += '0';
+        } else {
+            continue;
+        }
     }
-  }
-  
-  // Update the bit string in the input field or wherever it needs to be updated
-  $('#bitArea').val(invertedBitString); // Replace with the actual destination of the bit string
-  
-  // Convert the inverted bit string to decimal using BigNumber
-  var decimal = new BigNumber(invertedBitString, 2);
-  
-  // Update the decimal value and the grid based on the inverted bit string
-  setDecString(decimal);
-  setBitMap();
-  setPresetUrl();
+    
+    // Update the bit string input and convert it to decimal
+    $('#bitArea').val(invertedBitString);
+    var decimal = new BigNumber(invertedBitString, 2);
+    
+    // Update the decimal input and set the bit map
+    setDecString(decimal.times(17));
+    setBitMap();
+    setPresetUrl();
 });
+
 
 
 
