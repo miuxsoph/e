@@ -350,11 +350,7 @@ $('#invertBitsButton').click(function () {
 
     // Flip the bits
     var invertedBitString = '';
-    var i, j, k;
-		
-		for(i=0,j=0,k=0; k<bitString.length && i<17; ++k){
-		
-
+    for (let i = 0; i < bitString.length; i++) {
         invertedBitString += bitString[i] === '0' ? '1' : '0';
     }
 
@@ -367,6 +363,7 @@ $('#invertBitsButton').click(function () {
     setBitMap();
     setPresetUrl();
 });
+
 
 
 
