@@ -239,6 +239,25 @@ if (base62String !== '0') {
 }
 
 
+var savedValue;
+
+$('#saveValueBtn').click(function () {
+    savedValue = new BigNumber($('#decArea').val());
+    console.log(`Value ${savedValue} saved`);
+});
+
+$('#addSavedValueBtn').click(function () {
+    if (savedValue) {
+        var currentDecValue = new BigNumber($('#decArea').val());
+        var newDecValue = currentDecValue.plus(savedValue);
+        setDecString(newDecValue);
+        setBitString(newDecValue.dividedBy(17).integerValue(BigNumber.ROUND_FLOOR).toString(2).padStart(1802, '0'));
+        setBitMap();
+        setPresetUrl();
+    } else {
+        console.log('No saved value to add');
+    }
+});
 
 // // Shorthand for $( document ).ready()
 $(function () {
