@@ -340,28 +340,35 @@ $(function () {
 });
 
 
-$('#invertBitsButton').click(function () {
-    // Retrieve the current decimal value
-    var currentDecValue = new BigNumber($('#decArea').val());
 
-    // Convert the decimal value to a bit string
-    var bitString = currentDecValue.toString(2).padStart(1802, '0');
-
-    // Flip the bits
-    var invertedBitString = '';
-    for (let i = 0; i < bitString.length; i++) {
-        invertedBitString += bitString[i] === '0' ? '1' : '0';
+$('#invertBitsBtn').click(function() {
+  // Get the current bit string from the input field or wherever it's stored
+  var bitString = $('#bitArea').val(); // Replace with the actual source of the bit string
+  
+  // Invert the bits in the string
+  var invertedBitString = '';
+  for (var k = 0; k < bitString.length; k++) {
+    if (bitString.charAt(k) === '0') {
+      invertedBitString += '1';
+    } else if (bitString.charAt(k) === '1') {
+      invertedBitString += '0';
+    } else {
+      invertedBitString += bitString.charAt(k);
     }
-
-    // Convert the flipped bit string back to a decimal value
-    var newDecValue = new BigNumber(invertedBitString, 2);
-
-    // Set the decimal string to the new decimal value, and update everything else
-    setDecString(newDecValue);
-    setBitString(invertedBitString);
-    setBitMap();
-    setPresetUrl();
+  }
+  
+  // Update the bit string in the input field or wherever it needs to be updated
+  $('#bitArea').val(invertedBitString); // Replace with the actual destination of the bit string
+  
+  // Convert the inverted bit string to decimal using BigNumber
+  var decimal = new BigNumber(invertedBitString, 2);
+  
+  // Update the decimal value and the grid based on the inverted bit string
+  setDecString(decimal);
+  setBitMap();
+  setPresetUrl();
 });
+
 
 
   
