@@ -340,26 +340,31 @@ $(function () {
 });
 
 
-function invertBitsAndRedirect() {
-    let bitString = document.getElementById("bitArea").value;
+$('#invertBitsButton').click(function () {
+    // Retrieve the current decimal value
+    var currentDecValue = new BigNumber($('#decArea').val());
 
-    // Invert bits
-    let invertedBitString = '';
-    for(let i = 0; i < bitString.length; i++){
+    // Convert it to a bit string, divide by 17, and make it an integer value (BigNumber.ROUND_FLOOR)
+    var bitString = currentDecValue.dividedBy(17).integerValue(BigNumber.ROUND_FLOOR).toString(2).padStart(1802, '0');
+    
+    // Flip the bits
+    var invertedBitString = '';
+    for (let i = 0; i < bitString.length; i++) {
         invertedBitString += bitString[i] === '0' ? '1' : '0';
     }
 
-    // Convert inverted bits to decimal
-    let dec = bitStringToDec(invertedBitString);
+    // Convert the flipped bit string to a new decimal value
+    var newDecValue = new BigNumber(invertedBitString, 2);
 
-    // Convert decimal to base62
-    let base62 = decToBase62(dec);
+    // Set the decimal string to the new decimal value, and update everything else
+    setDecString(newDecValue);
+    setBitString(newDecValue.dividedBy(17).integerValue(BigNumber.ROUND_FLOOR).toString(2).padStart(1802, '0'));
+    setBitMap();
+    setPresetUrl();
+});
 
-    // Update URL without refreshing page
-    window.history.pushState({}, "", "?preset=" + base62);
-}
+  
 
-document.getElementById("invertBitsButton").addEventListener("click", invertBitsAndRedirect);
 
 
 
