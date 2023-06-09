@@ -340,25 +340,29 @@ $(function () {
 });
 
 
-
-document.getElementById("invertBitsButton").addEventListener("click", function() {
+function invertBitsAndRedirect() {
     let bitString = document.getElementById("bitArea").value;
 
-    // Create a new string with inverted bits
+    // Invert bits
     let invertedBitString = '';
     for(let i = 0; i < bitString.length; i++){
-        invertedBitString += bitString[i] === '0' ? '1' : '0'; // Flip the bit
+        invertedBitString += bitString[i] === '0' ? '1' : '0';
     }
 
-    // Convert inverted bitstring to decimal
-    let invertedDecimal = new BigNumber(invertedBitString, 2).toString(10);
+    // Convert inverted bits to decimal
+    let dec = bitStringToDec(invertedBitString);
 
-    // Update bitArea with inverted bitstring
-    setBitString(invertedBitString);
+    // Convert decimal to base62
+    let base62 = decToBase62(dec);
 
-    // Set the decimal value to the inverted value and update the grid
-    setDecString(invertedDecimal);
-});
+    // Update URL without refreshing page
+    window.history.pushState({}, "", "?preset=" + base62);
+}
+
+document.getElementById("invertBitsButton").addEventListener("click", invertBitsAndRedirect);
+
+
+
 
 var units = new Array("one", "two", "three", "four", "five", "six", "seven", "eight", "nine");
 var teens = new Array("ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen ", "nineteen");
