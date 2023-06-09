@@ -341,29 +341,33 @@ $(function () {
 
 
 
-$('#invertBtn').click(function () {
-    var bitString = $('#bitArea').val(); // Get the current bit string
-    
+$('#invertBitsButton').click(function () {
+    // Retrieve the current decimal value
+    var currentDecValue = new BigNumber($('#decArea').val());
+
+    // Convert the decimal value to a bit string
+    var bitString = currentDecValue.toString(2).padStart(1802, '0');
+
+    // Flip the bits
     var invertedBitString = '';
-    for (var k = 0; k < bitString.length && k < 1802; k++) {
-        if (bitString.charAt(k) === '0') {
-            invertedBitString += '1';
-        } else if (bitString.charAt(k) === '1') {
-            invertedBitString += '0';
-        } else {
-            continue;
-        }
+    var i, j, k;
+		
+		for(i=0,j=0,k=0; k<bitString.length && i<17; ++k){
+		
+
+        invertedBitString += bitString[i] === '0' ? '1' : '0';
     }
-    
-    // Update the bit string input and convert it to decimal
-    $('#bitArea').val(invertedBitString);
-    var decimal = new BigNumber(invertedBitString, 2);
-    
-    // Update the decimal input and set the bit map
-    setDecString(decimal.times(17));
+
+    // Convert the flipped bit string back to a decimal value
+    var newDecValue = new BigNumber(invertedBitString, 2);
+
+    // Set the decimal string to the new decimal value, and update everything else
+    setDecString(newDecValue);
+    setBitString(invertedBitString);
     setBitMap();
     setPresetUrl();
 });
+
 
 
 
