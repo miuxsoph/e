@@ -344,24 +344,25 @@ $('#invertBitsButton').click(function () {
     // Retrieve the current decimal value
     var currentDecValue = new BigNumber($('#decArea').val());
 
-    // Convert it to a bit string, divide by 17, and make it an integer value (BigNumber.ROUND_FLOOR)
-    var bitString = currentDecValue.dividedBy(17).integerValue(BigNumber.ROUND_FLOOR).toString(2).padStart(1802, '0');
-    
+    // Convert the decimal value to a bit string
+    var bitString = currentDecValue.toString(2).padStart(1802, '0');
+
     // Flip the bits
     var invertedBitString = '';
     for (let i = 0; i < bitString.length; i++) {
         invertedBitString += bitString[i] === '0' ? '1' : '0';
     }
 
-    // Convert the flipped bit string to a new decimal value
+    // Convert the flipped bit string back to a decimal value
     var newDecValue = new BigNumber(invertedBitString, 2);
 
     // Set the decimal string to the new decimal value, and update everything else
     setDecString(newDecValue);
-    setBitString(newDecValue.dividedBy(17).integerValue(BigNumber.ROUND_FLOOR).toString(2).padStart(1802, '0'));
+    setBitString(invertedBitString);
     setBitMap();
     setPresetUrl();
 });
+
 
   
 
