@@ -298,7 +298,7 @@ $('#playBtn').click(function () {
         } else {
             clearInterval(playInterval);
         }
-    }, 0);  // Change the interval as per your needs
+    }, 10);  // Change the interval as per your needs
 });
 
 $('#stopBtn').click(function () {
