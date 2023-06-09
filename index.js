@@ -259,6 +259,54 @@ $('#addSavedValueBtn').click(function () {
     }
 });
 
+
+var valuesArray = [];
+var playInterval;
+
+function displayError(index, value) {
+    console.log(`Error ${index + 1}: ${value.toString(62)}`);
+}
+
+$('#saveToArrayBtn').click(function () {
+    var currentDecValue = new BigNumber($('#decArea').val());
+    valuesArray.push(currentDecValue);
+    displayError(valuesArray.length - 1, currentDecValue);
+});
+
+$('#displayErrorBtn').click(function () {
+    for (var i = 0; i < valuesArray.length; i++) {
+        displayError(i, valuesArray[i]);
+    }
+});
+
+$('#clearOldestValueBtn').click(function () {
+    if (valuesArray.length > 0) {
+        valuesArray.shift();
+    }
+});
+
+$('#playBtn').click(function () {
+    var index = 0;
+    playInterval = setInterval(function () {
+        if (index < valuesArray.length) {
+            var decValue = valuesArray[index];
+            setDecString(decValue);
+            setBitString(decValue.dividedBy(17).integerValue(BigNumber.ROUND_FLOOR).toString(2).padStart(1802, '0'));
+            setBitMap();
+            setPresetUrl();
+            index++;
+        } else {
+            clearInterval(playInterval);
+        }
+    }, 2000);  // Change the interval as per your needs
+});
+
+$('#stopBtn').click(function () {
+    clearInterval(playInterval);
+});
+
+
+
 // // Shorthand for $( document ).ready()
 $(function () {
     const searchParams = new URLSearchParams(window.location.search);
