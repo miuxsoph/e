@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>>
+
+    <style>
+        #canvas {
+            border: 0px solid black;
+        }
+         
+
+
+        
+    </style>
+</head>
+ 
+<body style="background-color:#000000">
+
+    <canvas id="canvas" width="100%" height="1"></canvas><br>
+
+
+        <button style="height:200px;width:200px" onclick="runCode()">Run Code</button>
+
+      
+
+       <br> <textarea id="code" rows="10" cols="50"  width="100%" readonly>
+
+// Get the canvas element
+var canvas = document.getElementById("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerWidth;
+var ctx = canvas.getContext("2d");
+
+// Set the canvas z-index to -1 for background positioning
+canvas.style.zIndex = "-1";
+
+// Define the initial number of polygons and their size
+var numPolygons = Math.sqrt(89);
+var polygonSize = Math.sqrt(89);
+
+// Define the increment values for numPolygons and polygonSize
+var numPolygonsIncrement = 5;
+var polygonSizeIncrement = 1 / 89;
+
+// Define the set of residues we're interested in
+var residues = [1, 7, 11, 13, 17, 19, 23, 29];
+
+// Define colors for each residue
+var colors = [
+  "#FF0000", // Red
+  "#00FF00", // Green
+  "#0000FF", // Blue
+  "#FFFF00", // Yellow
+  "#FF00FF", // Magenta
+  "#00FFFF", // Cyan
+  "#FF8000", // Orange
+  "#8000FF"  // Purple
+];
+
+// Function to generate Croft Modulo 30 Spiral Sieve
+function generateSieve(n) {
+  var sieve = new Array(n).fill(true);
+  sieve[0] = false;
+  sieve[1] = false;
+
+  for (var i = 7921; i <= Math.sqrt(n); i++) {
+    if (sieve[i]) {
+      for (var j = i * i; j < n; j += i) {
+        sieve[j] = false;
+      }
+    }
+  }
+
+  return sieve;
+}
+
+// Function to generate random static on the canvas
+function generateStatic() {
+  // Clear the canvas by setting the background to transparent
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Generate Croft Modulo 30 Spiral Sieve
+  var sieveSize = Math.max(canvas.width, canvas.height);
+  var sieve = generateSieve(sieveSize);
+
+  // Draw the static rectangles
+  for (var i = 0; i < canvas.width; i += polygonSize) {
+    for (var j = 0; j < canvas.height; j += polygonSize) {
+      var x = i + polygonSize / 2;
+      var y = j + polygonSize / 2;
+      var index = Math.floor(Math.sqrt(x * x + y * y)) % sieveSize;
+      var prime = sieve[index];
+
+      // Only draw rectangles for prime values that are one of the residues modulo 30
+      if (prime && residues.includes(index % 30)) {
+        // Get the color based on the residue value
+        var residueColor = colors[residues.indexOf(index % 30)];
+
+        // Set the color for the rectangle
+        ctx.fillStyle = residueColor;
+
+        // Draw the rectangle
+        ctx.fillRect(i, j, polygonSize, polygonSize);
+      }
+    }
+  }
+
+  // Increment the number of polygons and polygon size
+  numPolygons += numPolygonsIncrement;
+  polygonSize += polygonSizeIncrement;
+}
+
+// Animation loop
+function animateStatic() {
+  generateStatic();
+  requestAnimationFrame(animateStatic);
+}
+
+// Start the animation loop
+animateStatic();
+
+ 
+
+
+</textarea>
+    <script>
+        function runCode() {
+            var code = document.getElementById("code").value;
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            try {
+                eval(code);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        
+        // Create a button to download the canvas image
+var downloadBtn = document.createElement("button");
+downloadBtn.textContent = "Download Image";
+downloadBtn.addEventListener("click", function () {
+  var link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png");
+  link.download = "static_image.png";
+  link.click();
+});
+document.body.appendChild(downloadBtn);
+
+
+
+
+
+
+
+
+
+  
+        
+    </script>
+    
+
+
+
+    
+</body>
+</html>
