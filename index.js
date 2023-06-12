@@ -417,63 +417,8 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
     reader.readAsText(file);
 });
 
-document.getElementById('compressButton').addEventListener('click', function () {
-    var jsonStr = JSON.stringify(valuesArray);
-    var compressed = pako.deflate(jsonStr, { to: 'string' });
-    var base64Compressed = btoa(compressed);
-    var newJson = { compressedData: base64Compressed };
 
-    // Create a Blob from the new JSON object
-    var blob = new Blob([JSON.stringify(newJson)], { type: "application/json" });
-
-    // Create a link element
-    var a = document.createElement("a");
-
-    // Create object URL for the Blob
-    var url = URL.createObjectURL(blob);
-
-    // Set up download link
-    a.href = url;
-    a.download = 'compressed.json';
-    a.click();
     
-    // Free up memory
-    setTimeout(function () {
-        URL.revokeObjectURL(url);
-    }, 1);
-});
-
-  document.getElementById('loadCompressedButton').addEventListener('click', function() {
-    var hiddenInput = document.createElement('input');
-    hiddenInput.type = 'file';
-    hiddenInput.accept = 'application/json';
-    hiddenInput.style.display = 'none';
-    document.body.appendChild(hiddenInput);
-    hiddenInput.click();
-
-    hiddenInput.addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        if (!file) return;
-
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var contents = e.target.result;
-            try {
-                var newJson = JSON.parse(contents);
-                var base64Compressed = newJson.compressedData;
-                var compressed = atob(base64Compressed);
-                var jsonStr = pako.inflate(compressed, { to: 'string' });
-                valuesArray = JSON.parse(jsonStr);
-                console.log("Array loaded successfully");
-            } catch(e) {
-                console.error("Could not parse JSON file: ", e);
-            }
-        };
-        reader.readAsText(file);
-        document.body.removeChild(hiddenInput);
-    });
-});
-
 
 
 
