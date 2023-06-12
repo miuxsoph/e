@@ -417,6 +417,31 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
     reader.readAsText(file);
 });
 
+document.getElementById('compressButton').addEventListener('click', function () {
+    var jsonStr = JSON.stringify(valuesArray);
+    var compressed = pako.deflate(jsonStr, { to: 'string' });
+    var base64Compressed = btoa(compressed);
+    var newJson = { compressedData: base64Compressed };
+
+    // Create a Blob from the new JSON object
+    var blob = new Blob([JSON.stringify(newJson)], { type: "application/json" });
+
+    // Create a link element
+    var a = document.createElement("a");
+
+    // Create object URL for the Blob
+    var url = URL.createObjectURL(blob);
+
+    // Set up download link
+    a.href = url;
+    a.download = 'compressed.json';
+    a.click();
+    
+    // Free up memory
+    setTimeout(function () {
+        URL.revokeObjectURL(url);
+    }, 1);
+});
 
   
 
