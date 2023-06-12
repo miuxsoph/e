@@ -443,7 +443,37 @@ document.getElementById('compressButton').addEventListener('click', function () 
     }, 1);
 });
 
-  
+  document.getElementById('loadCompressedButton').addEventListener('click', function() {
+    var hiddenInput = document.createElement('input');
+    hiddenInput.type = 'file';
+    hiddenInput.accept = 'application/json';
+    hiddenInput.style.display = 'none';
+    document.body.appendChild(hiddenInput);
+    hiddenInput.click();
+
+    hiddenInput.addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var contents = e.target.result;
+            try {
+                var newJson = JSON.parse(contents);
+                var base64Compressed = newJson.compressedData;
+                var compressed = atob(base64Compressed);
+                var jsonStr = pako.inflate(compressed, { to: 'string' });
+                valuesArray = JSON.parse(jsonStr);
+                console.log("Array loaded successfully");
+            } catch(e) {
+                console.error("Could not parse JSON file: ", e);
+            }
+        };
+        reader.readAsText(file);
+        document.body.removeChild(hiddenInput);
+    });
+});
+
 
 
 
