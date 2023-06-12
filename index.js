@@ -271,7 +271,7 @@ function displayError(index, value) {
 
 document.getElementById('saveButton').addEventListener('click', function() {
     // Convert the array to JSON
-    var json = JSON.stringify(valuesArray, null, 2);  // null and 2 are for pretty formatting
+    var json = JSON.stringify(valuesArray);  // null and 2 are for pretty formatting
 
     // Create a blob from the JSON
     var blob = new Blob([json], {type: 'application/json'});
@@ -430,22 +430,7 @@ document.getElementById('saveButton').addEventListener('click', function() {
 
 
 
-document.getElementById('loadButton').addEventListener('change', function(e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var contents = e.target.result;
-        try {
-            valuesArray = JSON.parse(contents);
-            console.log("Array loaded successfully");
-        } catch(e) {
-            console.error("Could not parse JSON file: ", e);
-        }
-    };
-    reader.readAsText(file);
-});
+
 
 
     
