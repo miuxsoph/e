@@ -365,6 +365,40 @@ $('#invertBitsButton').click(function () {
 });
 
 
+// Save valuesArray to JSON
+
+document.getElementById('saveButton').addEventListener('click', function() {
+    // Convert the array to JSON
+    var json = JSON.stringify(valuesArray, null, 2);  // null and 2 are for pretty formatting
+
+    // Create a blob from the JSON
+    var blob = new Blob([json], {type: 'application/json'});
+
+    // Create an object URL for the blob
+    var url = URL.createObjectURL(blob);
+
+    // Create a link element
+    var a = document.createElement('a');
+
+    // Set the href and download attributes of the link
+    a.href = url;
+    a.download = 'presets.json';
+
+    // Append the link to the body
+    document.body.appendChild(a);
+
+    // Simulate a click of the link
+    a.click();
+
+    // Remove the link from the body
+    document.body.removeChild(a);
+});
+
+$('#saveToArrayBtn').click(function () {
+    var currentDecValue = new BigNumber($('#decArea').val());
+    valuesArray.push(currentDecValue);
+    displayError(valuesArray.length - 1, currentDecValue);
+});
 
 
 
