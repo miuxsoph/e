@@ -1,72 +1,69 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
-<head>
-    <title>PBM Creator</title>
-    <script>
-        function createPBM() {
-            const width = parseInt(document.getElementById('width').value, 10);
-            const height = parseInt(document.getElementById('height').value, 10);
-            let bits = document.getElementById('bits').value;
-            const message = document.getElementById('message').value;
-            const binaryFormat = document.getElementById('binaryFormat').checked;
-
-            const paddedWidth = Math.ceil(width / 8) * 8;
-            let paddedBits = "";
-            for (let y = 0; y < height; y++) {
-                let row = bits.substr(y * width, width);
-                row = row + '0'.repeat(paddedWidth - width);
-                paddedBits += row;
-            }
-
-            paddedBits = paddedBits.substr(0, paddedWidth * height);
-
-            if (message) {
-                for (let i = 0; i < message.length; i++) {
-                    const charCode = message.charCodeAt(i);
-                    for (let bit = 0; bit < 8; bit++) {
-                        const bitValue = (charCode >> (7 - bit)) & 1;
-                        paddedBits = setBit(paddedBits, i * 8 + bit, bitValue);
-                    }
-                }
-            }
-
-            let pbm = binaryFormat ? "P4\n" : "P1\n";
-            pbm += `${paddedWidth} ${height}\n`;
-            if (binaryFormat) {
-                for (let i = 0; i < paddedBits.length; i += 8) {
-                    const byte = paddedBits.substr(i, 8);
-                    pbm += String.fromCharCode(parseInt(byte, 2));
-                }
-            } else {
-                pbm += paddedBits;
-            }
-
-            const element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(pbm));
-            element.setAttribute('download', "image.pbm");
-
-            element.style.display = 'none';
-            document.body.appendChild(element);
-
-            element.click();
-
-            document.body.removeChild(element);
-        }
-
-        function setBit(string, position, value) {
-            return string.substr(0, position) + value + string.substr(position + 1);
-        }
-    </script>
-</head>
 <body>
-    <h1>PBM Creator</h1>
-    <div>
-        <label>Width: </label><input id="width" type="text" /><br>
-        <label>Height: </label><input id="height" type="text" /><br>
-        <label>Bits (0 or 1 only): </label><input id="bits" type="text" /><br>
-        <label>Hidden Message: </label><input id="message" type="text" /><br>
-        <label>Use binary format: </label><input id="binaryFormat" type="checkbox" /><br>
-        <button onclick="createPBM()">Create PBM</button>
-    </div>
+
+Width: <input type="text" id="width" value="106"><br>
+Height: <input type="text" id="height" value="17"><br>
+Bits: <input type="text" id="bits"><br>
+Message: <input type="text" id="message"><br>
+Binary: <input type="checkbox" id="binary"><br>
+
+<button onclick="generatePBM()">Generate PBM</button>
+<a id="downloadLink" style="display: none">Download PBM</a>
+
+<script>
+function generatePBM() {
+    var width = document.getElementById('width').value;
+    var height = document.getElementById('height').value;
+    var bits = document.getElementById('bits').value;
+    var message = document.getElementById('message').value;
+    var binary = document.getElementById('binary').checked;
+
+    const paddedWidth = Math.ceil(width / 8) * 8;
+    let paddedBits = "";
+    for (let y = 0; y < height; y++) {
+        let row = bits.substr(y * width, width);
+        row = row + '0'.repeat(paddedWidth - width);
+        paddedBits += row;
+    }
+    paddedBits = paddedBits.substr(0, paddedWidth * height);
+    
+    var messageBits = '';
+    for (var i = 0; i < message.length; i++) {
+        messageBits += message[i].charCodeAt(0).toString(2).padStart(8, '0');
+    }
+
+    for (let i = 0; i < messageBits.length; i++) {
+        paddedBits = setCharAt(paddedBits, i, messageBits.charAt(i));
+    }
+
+    var header = binary ? 'P4' : 'P1';
+    var pbm = header + '\n' + paddedWidth + ' ' + height + '\n';
+
+    if (binary) {
+        for (var i = 0; i < paddedBits.length; i += 8) {
+            pbm += String.fromCharCode(parseInt(paddedBits.substr(i, 8), 2));
+        }
+    } else {
+        pbm += paddedBits;
+    }
+
+    // Create a Blob with the PBM data
+    var blob = new Blob([pbm], {type: "text/plain"});
+    var url = URL.createObjectURL(blob);
+
+    // Update the download link
+    var downloadLink = document.getElementById('downloadLink');
+    downloadLink.href = url;
+    downloadLink.download = 'image.pbm';
+    downloadLink.style.display = 'block';
+}
+
+function setCharAt(str, index, chr) {
+    if(index > str.length - 1) return str;
+    return str.substring(0, index) + chr + str.substring(index + 1);
+}
+</script>
+
 </body>
 </html>
