@@ -5,47 +5,34 @@
 
 
 
-  <title>Tezos Wallet Integration</title>
-  <!-- Include Taquito Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@taquito/taquito@7.6.0/dist/taquito.min.js"></script>
-<script>
-    // Connect to the Tezos network
-    const Tezos = new Taquito.TezosToolkit('https://mainnet.tezos.org');
 
-    const wallet = Tezos.wallet;
 
-    
-  
-  document.getElementById('connectWalletBtn').addEventListener('click', async () => {
-  try {
-    // Create an instance of BeaconWallet
-    const wallet = new taquito.BeaconWallet();
-
-    // Request wallet permission and connect
-    await wallet.requestPermissions({
-      network: {
-        type: 'mainnet', // Change to 'delphinet' for testnet
-      },
-    });
-
-    // Set the wallet provider in the TezosToolkit
-    const Tezos = new taquito.TezosToolkit();
-    Tezos.setWalletProvider(wallet);
-
-    // Retrieve the connected wallet's address
-    const address = await wallet.getPKH();
-
-    // Perform further actions with the wallet address, such as generating generative art
-    // or interacting with smart contracts
-
-    console.log('Wallet connected:', address);
-  } catch (error) {
-    console.error('Error connecting wallet:', error);
-  }
-});
 
   
-  </script>
+    <script src="https://wallet.kukai.app/latest/beacon-sdk.js"></script>
+  </head>
+  <body>
+    <!-- Your HTML content -->
+    <button id="connectWalletBtn">Connect Wallet</button>
+
+    <script>
+      document.getElementById("connectWalletBtn").addEventListener("click", async () => {
+        try {
+          const wallet = new beaconWallet.BeaconWallet();
+          await wallet.requestPermissions();
+          const activeAccount = await wallet.client.getActiveAccount();
+          console.log("Connected wallet address:", activeAccount.address);
+        } catch (error) {
+          console.error("Error connecting wallet:", error);
+        }
+      });
+    </script>
+  
+
+
+
+
+
 
   
 
