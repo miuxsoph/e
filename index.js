@@ -466,7 +466,7 @@ document.getElementById('saveEncryptedButton').addEventListener('click', async f
     let keyData = new Uint8Array(await window.crypto.subtle.exportKey('raw', key));
     document.getElementById('keyInput').value = JSON.stringify(Array.from(keyData));
 
-    alert("Encrypted data has been saved to localStorage. The key has been put in the input field.");
+
 });
 
 document.getElementById('loadEncryptedButton').addEventListener('click', async function() {
