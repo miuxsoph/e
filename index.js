@@ -576,13 +576,19 @@ $('#repeaterButton').click(function () {
     var savedValue = new BigNumber($('#decArea').val());
     console.log(`Value ${savedValue} saved`);
 
+    valuesArray.push(savedValue);
+
     for (var i = 0; i < 256; i++) {
-        var currentDecValue = new BigNumber($('#decArea').val());
-        var newDecValue = currentDecValue.plus(savedValue);
+        var lastValue = valuesArray[valuesArray.length - 1];
+        var newDecValue = lastValue.plus(savedValue);
         valuesArray.push(newDecValue);
-        displayError(valuesArray.length - 1, newDecValue);
+    }
+
+    for (var i = valuesArray.length - 256; i < valuesArray.length; i++) {
+        displayError(i, valuesArray[i]);
     }
 });
+
 
 
 
