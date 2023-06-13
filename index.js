@@ -428,6 +428,7 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
 
 
 document.getElementById('saveEncButton').addEventListener('click', function() {
+    /document.getElementById('saveEncButton').addEventListener('click', function() {
     // Generate a random encryption key
     var key = CryptoJS.lib.WordArray.random(128/8).toString();
 
@@ -438,10 +439,13 @@ document.getElementById('saveEncButton').addEventListener('click', function() {
     var json = JSON.stringify(valuesArray);  
 
     // Encrypt the JSON
-    var encryptedJson = CryptoJS.AES.encrypt(json, key).toString();
+    var encryptedJson = CryptoJS.AES.encrypt(json, key);
+
+    // Convert encrypted data to a string
+    var encryptedStr = encryptedJson.toString();
 
     // Create a blob from the encrypted JSON
-    var blob = new Blob([encryptedJson], {type: 'application/octet-stream'});
+    var blob = new Blob([encryptedStr], {type: 'application/octet-stream'});
 
     // Create an object URL for the blob
     var url = URL.createObjectURL(blob);
@@ -467,26 +471,30 @@ document.getElementById('saveEncButton').addEventListener('click', function() {
 document.getElementById('loadEncButton').addEventListener('change', function(e) {
     var file = e.target.files[0];
     if (!file) return;
-
-    // Get the key from the text field
-    var key = document.getElementById('keyField').value;
     
     var reader = new FileReader();
     reader.onload = function(e) {
         var contents = e.target.result;
+        var key = document.getElementById('keyField').value;
         try {
-            // Decrypt the contents
-            var decryptedJson = CryptoJS.AES.decrypt(contents, key).toString(CryptoJS.enc.Utf8);
+            // Decrypt the contents using the key
+            var decrypted = CryptoJS.AES.decrypt(contents, key);
+            
+            // Convert the decrypted data from a WordArray to a string
+            var decryptedStr = decrypted.toString(CryptoJS.enc.Utf8);
 
-            // Parse the JSON to an array
-            valuesArray = JSON.parse(decryptedJson);
+            // Parse the JSON
+            valuesArray = JSON.parse(decryptedStr);
             console.log("Array loaded successfully");
         } catch(e) {
-            console.error("Could not parse JSON file: ", e);
+            console.error("Could not decrypt or parse JSON file: ", e);
         }
     };
     reader.readAsText(file);
 });
+
+
+
 
 
 
