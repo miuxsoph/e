@@ -427,71 +427,11 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
 });
 
 
-document.getElementById('saveEncButton').addEventListener('click', function() {
-    /document.getElementById('saveEncButton').addEventListener('click', function() {
-    // Generate a random encryption key
-    var key = CryptoJS.lib.WordArray.random(128/8).toString();
-
-    // Set the key in the text field
-    document.getElementById('keyField').value = key;
-
-    // Convert the array to JSON
-    var json = JSON.stringify(valuesArray);  
-
-    // Encrypt the JSON
-    var encryptedJson = CryptoJS.AES.encrypt(json, key);
-
-    // Convert encrypted data to a string
-    var encryptedStr = encryptedJson.toString();
-
-    // Create a blob from the encrypted JSON
-    var blob = new Blob([encryptedStr], {type: 'application/octet-stream'});
-
-    // Create an object URL for the blob
-    var url = URL.createObjectURL(blob);
-
-    // Create a link element
-    var a = document.createElement('a');
-
-    // Set the href and download attributes of the link
-    a.href = url;
-    a.download = 'encryptedPresets.json';
-
-    // Append the link to the body
-    document.body.appendChild(a);
-
-    // Simulate a click of the link
-    a.click();
-
-    // Remove the link from the body
-    document.body.removeChild(a);
-});
 
 
-document.getElementById('loadEncButton').addEventListener('change', function(e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var contents = e.target.result;
-        var key = document.getElementById('keyField').value;
-        try {
-            // Decrypt the contents using the key
-            var decrypted = CryptoJS.AES.decrypt(contents, key);
-            
-            // Convert the decrypted data from a WordArray to a string
-            var decryptedStr = decrypted.toString(CryptoJS.enc.Utf8);
 
-            // Parse the JSON
-            valuesArray = JSON.parse(decryptedStr);
-            console.log("Array loaded successfully");
-        } catch(e) {
-            console.error("Could not decrypt or parse JSON file: ", e);
-        }
-    };
-    reader.readAsText(file);
-});
+
+
 
 
 
