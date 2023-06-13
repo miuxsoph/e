@@ -368,11 +368,15 @@ $('#invertBitsButton').click(function () {
 });
 
 
-// Save valuesArray to JSON
-
+// // Save valuesArray to JSON
 document.getElementById('saveButton').addEventListener('click', function() {
+    // Convert BigNumber instances to strings before JSON.stringify
+    var stringArray = valuesArray.map(function(bigNum) {
+        return bigNum.toString();
+    });
+
     // Convert the array to JSON
-    var json = JSON.stringify(valuesArray);  
+    var json = JSON.stringify(stringArray);
 
     // Create a blob from the JSON
     var blob = new Blob([json], {type: 'application/json'});
@@ -397,18 +401,23 @@ document.getElementById('saveButton').addEventListener('click', function() {
     document.body.removeChild(a);
 });
 
-
-
-
+// Load JSON to valuesArray
 document.getElementById('loadButton').addEventListener('change', function(e) {
     var file = e.target.files[0];
     if (!file) return;
-    
+
     var reader = new FileReader();
     reader.onload = function(e) {
         var contents = e.target.result;
         try {
-            valuesArray = JSON.parse(contents);
+            // Parse the JSON to get an array of strings
+            var stringArray = JSON.parse(contents);
+
+            // Convert the strings back to BigNumber instances
+            valuesArray = stringArray.map(function(str) {
+                return new BigNumber(str);
+            });
+
             console.log("Array loaded successfully");
         } catch(e) {
             console.error("Could not parse JSON file: ", e);
@@ -416,6 +425,12 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
     };
     reader.readAsText(file);
 });
+
+
+
+
+
+
 
 
   
