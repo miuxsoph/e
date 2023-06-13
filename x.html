@@ -9,23 +9,11 @@
 
 
   
-    <script src="https://wallet.kukai.app/latest/beacon-sdk.js"></script>
+    
   
    
 
-    <script>
-      document.getElementById("connectWalletBtn").addEventListener("click", async () => {
-        try {
-          const wallet = new beaconWallet.BeaconWallet();
-          await wallet.requestPermissions();
-          const activeAccount = await wallet.client.getActiveAccount();
-          console.log("Connected wallet address:", activeAccount.address);
-        } catch (error) {
-          console.error("Error connecting wallet:", error);
-        }
-      });
-    </script>
-  
+    
 
 
 
@@ -200,7 +188,7 @@ document.body.appendChild(downloadBtn);
     
   <h1>Tezos Wallet Integration</h1>
 
-  <button id="connectWalletBtn">Connect Wallet</button>
+  <button id="button">aux button</button>
 
   
 
