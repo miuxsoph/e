@@ -427,74 +427,74 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
 });
 
 
-
-
-
-
-
-async function encrypt(data, key) {
-    let encoded = new TextEncoder().encode(data);
-    let encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: window.crypto.getRandomValues(new Uint8Array(12)) }, key, encoded);
-    return new Uint8Array(encrypted);
-}
-
-async function decrypt(data, key) {
-    let decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: window.crypto.getRandomValues(new Uint8Array(12)) }, key, data);
-    return new TextDecoder().decode(new Uint8Array(decrypted));
-}
-
-document.getElementById('saveEncryptedButton').addEventListener('click', async function() {
+document.getElementById('saveEncButton').addEventListener('click', function() {
     // Generate a random encryption key
-    let key = await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+    var key = CryptoJS.lib.WordArray.random(128/8).toString();
+
+    // Set the key in the text field
+    document.getElementById('keyField').value = key;
 
     // Convert the array to JSON
-    var json = JSON.stringify(valuesArray);
+    var json = JSON.stringify(valuesArray);  
 
-    // Deflate the JSON using pako
-    var deflated = pako.deflate(json, { to: 'string' });
+    // Encrypt the JSON
+    var encryptedJson = CryptoJS.AES.encrypt(json, key).toString();
 
-    // Base64 encode the deflated JSON
-    var base64 = btoa(deflated);
+    // Create a blob from the encrypted JSON
+    var blob = new Blob([encryptedJson], {type: 'application/octet-stream'});
 
-    // Encrypt the base64 string
-    let encrypted = await encrypt(base64, key);
+    // Create an object URL for the blob
+    var url = URL.createObjectURL(blob);
 
-    // Store the encrypted data
-    localStorage.setItem('data', JSON.stringify(Array.from(encrypted)));
+    // Create a link element
+    var a = document.createElement('a');
 
-    // Export the key and put it in the input field
-    let keyData = new Uint8Array(await window.crypto.subtle.exportKey('raw', key));
-    document.getElementById('keyInput').value = JSON.stringify(Array.from(keyData));
+    // Set the href and download attributes of the link
+    a.href = url;
+    a.download = 'encryptedPresets.json';
 
+    // Append the link to the body
+    document.body.appendChild(a);
 
+    // Simulate a click of the link
+    a.click();
+
+    // Remove the link from the body
+    document.body.removeChild(a);
 });
 
-document.getElementById('loadEncryptedButton').addEventListener('click', async function() {
-    // Get the key from the input field
-    let keyData = new Uint8Array(JSON.parse(document.getElementById('keyInput').value));
 
-    // Retrieve the encrypted data from storage
-    let encryptedData = new Uint8Array(JSON.parse(localStorage.getItem('data')));
+document.getElementById('loadEncButton').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
 
-    // Import the key
-    let key = await window.crypto.subtle.importKey('raw', keyData, { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
+    // Get the key from the text field
+    var key = document.getElementById('keyField').value;
+    
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        try {
+            // Decrypt the contents
+            var decryptedJson = CryptoJS.AES.decrypt(contents, key).toString(CryptoJS.enc.Utf8);
 
-    // Decrypt the data
-    let decrypted = await decrypt(encryptedData, key);
-
-    // Base64 decode the decrypted contents
-    var decoded = atob(decrypted);
-
-    // Inflate the contents using pako
-    var inflated = pako.inflate(decoded, { to: 'string' });
-
-    try {
-        valuesArray = JSON.parse(inflated);
-        console.log("Array loaded successfully");
-    } catch(e) {
-        console.error("Could not parse JSON file: ", e);
-    }
+            // Parse the JSON to an array
+            valuesArray = JSON.parse(decryptedJson);
+            console.log("Array loaded successfully");
+        } catch(e) {
+            console.error("Could not parse JSON file: ", e);
+        }
+    };
+    reader.readAsText(file);
 });
+
+
+
+
+
+
+    
+
 
   
 
