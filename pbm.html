@@ -12,6 +12,8 @@
         <input type="number" id="height" name="height" required><br>
         <label for="bitfield">Bitfield:</label>
         <textarea id="bitfield" name="bitfield" required></textarea><br>
+        <label for="binary">Binary Format:</label>
+        <input type="checkbox" id="binary" name="binary"><br>
         <input type="button" value="Generate PBM" onclick="generatePBM()">
     </form>
 
@@ -20,9 +22,19 @@
             var width = document.getElementById('width').value;
             var height = document.getElementById('height').value;
             var bitfield = document.getElementById('bitfield').value;
+            var binary = document.getElementById('binary').checked;
 
-            var header = 'P1\n' + '# Created by PBM Generator\n' + width + ' ' + height + '\n';
-            var pbm = header + bitfield.replace(/(.{1})/g,"$1 ");
+            if (binary) {
+                var header = 'P4\n' + '# Created by PBM Generator\n' + width + ' ' + height + '\n';
+                var bytes = [];
+                for (var i = 0; i < bitfield.length; i += 8) {
+                    bytes.push(parseInt(bitfield.substr(i, 8), 2));
+                }
+                var pbm = header + String.fromCharCode.apply(null, bytes);
+            } else {
+                var header = 'P1\n' + '# Created by PBM Generator\n' + width + ' ' + height + '\n';
+                var pbm = header + bitfield.replace(/(.{1})/g,"$1 ");
+            }
 
             var element = document.createElement('a');
             element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(pbm));
@@ -38,3 +50,4 @@
     </script>
 </body>
 </html>
+
