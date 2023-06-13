@@ -14,24 +14,37 @@
 
     const wallet = Tezos.wallet;
 
-    // Implement wallet connection UI
-    const connectWalletBtn = document.getElementById('connectWalletBtn');
-    connectWalletBtn.addEventListener('click', async () => {
-      try {
-        // Connect the wallet
-        await wallet.connect();
-        console.log('Wallet connected successfully');
-        
-        // Retrieve user's address
-        const address = await wallet.pkh();
-        console.log('User address:', address);
-        
-        // Perform blockchain operations
-        // ... (your code here)
-      } catch (error) {
-        console.error('Error connecting wallet:', error);
-      }
+    
+  
+  document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+  try {
+    // Create an instance of BeaconWallet
+    const wallet = new taquito.BeaconWallet();
+
+    // Request wallet permission and connect
+    await wallet.requestPermissions({
+      network: {
+        type: 'mainnet', // Change to 'delphinet' for testnet
+      },
     });
+
+    // Set the wallet provider in the TezosToolkit
+    const Tezos = new taquito.TezosToolkit();
+    Tezos.setWalletProvider(wallet);
+
+    // Retrieve the connected wallet's address
+    const address = await wallet.getPKH();
+
+    // Perform further actions with the wallet address, such as generating generative art
+    // or interacting with smart contracts
+
+    console.log('Wallet connected:', address);
+  } catch (error) {
+    console.error('Error connecting wallet:', error);
+  }
+});
+
+  
   </script>
 
   
