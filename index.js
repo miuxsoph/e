@@ -572,6 +572,17 @@ document.getElementById('loadEncButton').addEventListener('change', function(e) 
 
            
 
+$('#repeaterButton').click(function () {
+    var savedValue = new BigNumber($('#decArea').val());
+    console.log(`Value ${savedValue} saved`);
+
+    for (var i = 0; i < 256; i++) {
+        var currentDecValue = new BigNumber($('#decArea').val());
+        var newDecValue = currentDecValue.plus(savedValue);
+        valuesArray.push(newDecValue);
+        displayError(valuesArray.length - 1, newDecValue);
+    }
+});
 
 
 
