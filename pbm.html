@@ -2,68 +2,75 @@
 <html>
 <body>
 
-Width: <input type="text" id="width" value="106"><br>
-Height: <input type="text" id="height" value="17"><br>
-Bits: <input type="text" id="bits"><br>
-Message: <input type="text" id="message"><br>
-Binary: <input type="checkbox" id="binary"><br>
+<h2>NetPBM Generator</h2>
 
-<button onclick="generatePBM()">Generate PBM</button>
-<a id="downloadLink" style="display: none">Download PBM</a>
+<form id="netpbmForm">
+  <label for="width">Width:</label><br>
+  <input type="text" id="width" name="width"><br>
+  <label for="height">Height:</label><br>
+  <input type="text" id="height" name="height"><br>
+  <label for="bitField">Bit Field (0s and 1s only):</label><br>
+  <textarea id="bitField" name="bitField" rows="4" cols="50"></textarea><br>
+  <input type="checkbox" id="formatP4" name="formatP4">
+  <label for="formatP4"> Use P4 format (If unchecked, P1 will be used)</label><br><br>
+  <input type="button" value="Generate" onclick="generateNetPBM()">
+  <a id="downloadLink" style="display: none">Download</a>
+</form>
 
 <script>
-function generatePBM() {
-    var width = document.getElementById('width').value;
-    var height = document.getElementById('height').value;
-    var bits = document.getElementById('bits').value;
-    var message = document.getElementById('message').value;
-    var binary = document.getElementById('binary').checked;
+function generateNetPBM() {
+  const width = document.getElementById("width").value;
+  const height = document.getElementById("height").value;
+  const bitField = document.getElementById("bitField").value;
+  const formatP4 = document.getElementById("formatP4").checked;
 
+  if (!width || !height || !bitField || !bitField.match(/^[01]+$/)) {
+    alert("Invalid input");
+    return;
+  }
+
+  if (formatP4) {
+    const header = `P4\n${width} ${height}\n`;
+    const rows = Math.ceil(bitField.length / width);
     const paddedWidth = Math.ceil(width / 8) * 8;
-    let paddedBits = "";
-    for (let y = 0; y < height; y++) {
-        let row = bits.substr(y * width, width);
-        row = row + '0'.repeat(paddedWidth - width);
-        paddedBits += row;
-    }
-    paddedBits = paddedBits.substr(0, paddedWidth * height);
-    
-    var messageBits = '';
-    for (var i = 0; i < message.length; i++) {
-        messageBits += message[i].charCodeAt(0).toString(2).padStart(8, '0');
-    }
+    let byteField = [];
 
-    for (let i = 0; i < messageBits.length; i++) {
-        paddedBits = setCharAt(paddedBits, i, messageBits.charAt(i));
-    }
-
-    var header = binary ? 'P4' : 'P1';
-    var pbm = header + '\n' + paddedWidth + ' ' + height + '\n';
-
-    if (binary) {
-        for (var i = 0; i < paddedBits.length; i += 8) {
-            pbm += String.fromCharCode(parseInt(paddedBits.substr(i, 8), 2));
+    for (let row = 0; row < rows; row++) {
+      for (let byteIndex = 0; byteIndex < paddedWidth / 8; byteIndex++) {
+        let byteValue = 0;
+        for (let bitIndex = 0; bitIndex < 8; bitIndex++) {
+          const fieldIndex = row * width + byteIndex * 8 + bitIndex;
+          if (fieldIndex < bitField.length && bitField[fieldIndex] === '1') {
+            byteValue |= 1 << (7 - bitIndex);
+          }
         }
-    } else {
-        pbm += paddedBits;
+        byteField.push(byteValue);
+      }
     }
+    const blob = new Blob([new TextEncoder().encode(header), new Uint8Array(byteField)], {type: "application/octet-stream"});
+    const url = URL.createObjectURL(blob);
 
-    // Create a Blob with the PBM data
-    var blob = new Blob([pbm], {type: "text/plain"});
-    var url = URL.createObjectURL(blob);
-
-    // Update the download link
-    var downloadLink = document.getElementById('downloadLink');
+    const downloadLink = document.getElementById("downloadLink");
     downloadLink.href = url;
-    downloadLink.download = 'image.pbm';
-    downloadLink.style.display = 'block';
-}
+    downloadLink.download = `image.pbm`;
+    downloadLink.style.display = "block";
 
-function setCharAt(str, index, chr) {
-    if(index > str.length - 1) return str;
-    return str.substring(0, index) + chr + str.substring(index + 1);
+  } else {
+    const magicNumber = "P1";
+    const netpbm = `${magicNumber}\n${width} ${height}\n${bitField}`;
+
+    const blob = new Blob([netpbm], {type: "text/plain;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+
+    const downloadLink = document.getElementById("downloadLink");
+    downloadLink.href = url;
+    downloadLink.download = `image.pbm`;
+    downloadLink.style.display = "block";
+  }
 }
 </script>
 
 </body>
 </html>
+
+    
