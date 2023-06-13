@@ -429,7 +429,9 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
 
 
         
-// Generate random encryption key and save it to text field
+
+  
+
 function generateKey() {
     return window.crypto.subtle.generateKey(
         {
@@ -449,7 +451,50 @@ function generateKey() {
     });
 }
 
-// Save valuesArray to encrypted JSON
+function decryptData(data, key) {
+    // Decode the data URL
+    var dataURL = atob(data.split(',')[1]);
+
+    // Extract the initialization vector (IV) from the first 12 bytes
+    var iv = new Uint8Array(dataURL.slice(0, 12).split('').map(function(char) {
+        return char.charCodeAt(0);
+    }));
+
+    // Extract the encrypted data from the remaining bytes
+    var encryptedData = new Uint8Array(dataURL.slice(12).split('').map(function(char) {
+        return char.charCodeAt(0);
+    }));
+
+    // Convert the key from JWK format to CryptoKey object
+    return window.crypto.subtle.importKey(
+        "jwk",
+        {
+            kty: "oct",
+            k: key,
+            alg: "A256GCM",
+            ext: true,
+        },
+        {
+            name: "AES-GCM",
+        },
+        false,
+        ["decrypt"]
+    ).then(function(key) {
+        return window.crypto.subtle.decrypt(
+            {
+                name: "AES-GCM",
+                iv: iv
+            },
+            key,
+            encryptedData
+        );
+    }).then(function(decryptedData) {
+        // Convert the decrypted data to a string
+        var decoder = new TextDecoder();
+        return decoder.decode(decryptedData);
+    });
+}
+
 document.getElementById('saveEncButton').addEventListener('click', function() {
     // Convert BigNumber instances to strings before JSON.stringify
     var stringArray = valuesArray.map(function(bigNum) {
@@ -496,32 +541,33 @@ document.getElementById('saveEncButton').addEventListener('click', function() {
 });
 
 document.getElementById('loadEncButton').addEventListener('change', function(e) {
-  var file = e.target.files[0];
-  if (!file) return;
+    var file = e.target.files[0];
+    if (!file) return;
 
-  var reader = new FileReader();
-  reader.onload = async function(e) {
-    var contents = e.target.result;
-    var key = document.getElementById('keyField').value;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        var key = document.getElementById('keyField').value;
 
-    try {
-      // Decrypt the encrypted JSON data using the key
-      var decryptedData = await decryptData(contents, key);
+        decryptData(contents, key).then(function(decryptedData) {
+            try {
+                // Parse the decrypted JSON to get an array of strings
+                var stringArray = JSON.parse(decryptedData);
 
-      // Parse the decrypted JSON to get an array of strings
-      var stringArray = JSON.parse(decryptedData);
+                // Convert the strings back to BigNumber instances
+                valuesArray = stringArray.map(function(str) {
+                    return new BigNumber(str);
+                });
 
-      // Convert the strings back to BigNumber instances
-      valuesArray = stringArray.map(function(str) {
-        return new BigNumber(str);
-      });
-
-      console.log("Array loaded successfully");
-    } catch (e) {
-      console.error("Could not decrypt and parse JSON file: ", e);
-    }
-  };
-  reader.readAsText(file);
+                console.log("Array loaded successfully");
+            } catch (e) {
+                console.error("Could not parse decrypted JSON file: ", e);
+            }
+        }).catch(function(e) {
+            console.error("Could not decrypt file: ", e);
+        });
+    };
+    reader.readAsDataURL(file);
 });
 
            
