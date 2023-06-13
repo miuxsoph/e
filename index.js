@@ -578,13 +578,13 @@ $('#repeaterButton').click(function () {
 
     valuesArray.push(savedValue);
 
-    for (var i = 0; i < 256; i++) {
+    for (var i = 0; i < 65536; i++) {
         var lastValue = valuesArray[valuesArray.length - 1];
         var newDecValue = lastValue.plus(savedValue);
         valuesArray.push(newDecValue);
     }
 
-    for (var i = valuesArray.length - 256; i < valuesArray.length; i++) {
+    for (var i = valuesArray.length - 65536; i < valuesArray.length; i++) {
         displayError(i, valuesArray[i]);
     }
 });
