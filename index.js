@@ -271,7 +271,7 @@ function displayError(index, value) {
 
 document.getElementById('saveButton').addEventListener('click', function() {
     // Convert the array to JSON
-    var json = JSON.stringify(valuesArray);  // null and 2 are for pretty formatting
+    var json = JSON.stringify(valuesArray);  
 
     // Create a blob from the JSON
     var blob = new Blob([json], {type: 'application/json'});
