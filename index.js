@@ -428,115 +428,136 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
 
 
 
-        document.getElementById('loadEncButton').addEventListener('change', function(e) {
-    var file = e.target.files[0];
-    if (!file) return;
-
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var contents = new Uint8Array(e.target.result);
-
-        // Get the key from keyField
-        var rawKey = new Uint8Array(atob(document.getElementById('keyField').value).split('').map(function(c) { return c.charCodeAt(0); }));
-
-        // Get the IV and the encrypted data from contents
-        var iv = contents.slice(0, 16);
-        var encryptedData = contents.slice(16);
-
-        window.crypto.subtle.importKey(
-            "raw",
-            rawKey,
-            {name: "AES-CBC", length: 256},
-            true,
-            ["encrypt", "decrypt"]
-        ).then(function(key) {
-            window.crypto.subtle.decrypt(
-                {name: "AES-CBC", iv: iv},
-                key,
-                encryptedData
-            ).then(function(decrypted) {
-                var json = new TextDecoder().decode(new Uint8Array(decrypted));
-                try {
-                    // Parse the JSON to get an array of strings
-                    var stringArray = JSON.parse(json);
-
-                    // Convert the strings back to BigNumber instances
-                    valuesArray = stringArray.map(function(str) {
-                        return new BigNumber(str);
-                    });
-
-                    console.log("Array loaded successfully");
-                } catch(e) {
-                    console.error("Could not parse JSON file: ", e);
-                }
-            });
+        
+// Generate random encryption key and save it to text field
+function generateKey() {
+    return window.crypto.subtle.generateKey(
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        true,
+        ["encrypt", "decrypt"]
+    ).then(function(key) {
+        return window.crypto.subtle.exportKey(
+            "jwk", 
+            key
+        ).then(function(keydata) {
+            document.getElementById('keyField').value = keydata.k;
+            return key;
         });
-    };
-    reader.readAsArrayBuffer(file);
-});
+    });
+}
 
-            
+// Save valuesArray to encrypted JSON
 document.getElementById('saveEncButton').addEventListener('click', function() {
-    // Generate a random 256-bit key
-    var rawKey = window.crypto.getRandomValues(new Uint8Array(32));
-    // Convert key to base64 and show in keyField
-    document.getElementById('keyField').value = btoa(String.fromCharCode.apply(null, rawKey));
-
-    // Convert BigNumber instances to strings
+    // Convert BigNumber instances to strings before JSON.stringify
     var stringArray = valuesArray.map(function(bigNum) {
         return bigNum.toString();
     });
 
-    // Convert to JSON
+    // Convert the array to JSON
     var json = JSON.stringify(stringArray);
 
-    // Encode JSON as UTF-8
-    var encoder = new TextEncoder();
-    var data = encoder.encode(json);
+    generateKey().then(function(key) {
+        let encoder = new TextEncoder();
+        let data = encoder.encode(json);
+        let iv = window.crypto.getRandomValues(new Uint8Array(12));
 
-    // Generate random 128-bit IV
-    var iv = window.crypto.getRandomValues(new Uint8Array(16));
-
-    window.crypto.subtle.importKey(
-        "raw",
-        rawKey,
-        {name: "AES-CBC", length: 256},
-        true,
-        ["encrypt", "decrypt"]
-    ).then(function(key) {
-        window.crypto.subtle.encrypt(
-            {name: "AES-CBC", iv: iv},
+        return window.crypto.subtle.encrypt(
+            {
+                name: "AES-GCM",
+                iv: iv
+            },
             key,
             data
-        ).then(function(encrypted) {
-            // Concatenate IV and encrypted data
-            var contents = new Uint8Array(iv.length + encrypted.byteLength);
-            contents.set(new Uint8Array(iv), 0);
-            contents.set(new Uint8Array(encrypted), iv.length);
+        ).then(function(encrypted){
+            let reader = new FileReader();
+            reader.readAsDataURL(new Blob([new Uint8Array(iv).buffer, encrypted]));
+            reader.onloadend = function() {
+                // Create a link element
+                let a = document.createElement('a');
 
-            // Create a blob from the contents
-            var blob = new Blob([contents], {type: 'application/octet-stream'});
+                // Set the href and download attributes of the link
+                a.href = reader.result;
+                a.download = 'encryptedPresets.json';
 
-            // Create an object URL for the blob
-            var url = URL.createObjectURL(blob);
+                // Append the link to the body
+                document.body.appendChild(a);
 
-            // Create a link element
-            var a = document.createElement('a');
+                // Simulate a click of the link
+                a.click();
 
-            // Set the href and download attributes of the link
-            a.href = url;
-            a.download = 'encryptedPresets.json';
-
-            // Append the link to the body
-            document.body.appendChild(a);
-
-            // Simulate a click of the link
-            a.click();
-
-            // Remove the link from the body
-            document.body.removeChild(a);
+                // Remove the link from the body
+                document.body.removeChild(a);
+            }
         });
     });
+});
+
+// Load JSON to valuesArray
+document.getElementById('loadEncButton').addEventListener('change', function(e) {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let contents = e.target.result;
+        let keyString = document.getElementById('keyField').value;
+        let keydata = {
+            kty: "oct",
+            alg: "A256GCM",
+            k: keyString,
+            ext: true,
+            key_ops: ["encrypt", "decrypt"]
+        };
+
+        let base64 = contents.split(",")[1];
+        let raw = atob(base64);
+        let rawLength = raw.length;
+        let array = new Uint8Array(new ArrayBuffer(rawLength + 12));
+        let iv = array.subarray(0, 12);
+        let data = array.subarray(12);
+
+        for(let i = 0; i < rawLength; i++) {
+            data[i] = raw.charCodeAt(i);
+        }
+
+        window.crypto.subtle.importKey(
+            "jwk",
+            keydata,
+            {
+                name: "AES-GCM",
+                length: 256
+            },
+            false,
+            ["encrypt", "decrypt"]
+        ).then(function(key) {
+            return window.crypto.subtle.decrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv
+                },
+                key,
+                data.buffer
+            );
+        }).then(function(decrypted){
+            let decoder = new TextDecoder();
+            let json = decoder.decode(decrypted);
+            // Parse the JSON to get an array of strings
+            let stringArray = JSON.parse(json);
+
+            // Convert the strings back to BigNumber instances
+            valuesArray = stringArray.map(function(str) {
+                return new BigNumber(str);
+            });
+
+            console.log("Array loaded successfully");
+        }).catch(function(e){
+            console.error("Could not decrypt file: ", e);
+        });
+    };
+    reader.readAsDataURL(file);
 });
 
 
