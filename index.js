@@ -428,23 +428,120 @@ document.getElementById('loadButton').addEventListener('change', function(e) {
 
 
 
+        document.getElementById('loadEncButton').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
 
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = new Uint8Array(e.target.result);
 
+        // Get the key from keyField
+        var rawKey = new Uint8Array(atob(document.getElementById('keyField').value).split('').map(function(c) { return c.charCodeAt(0); }));
 
+        // Get the IV and the encrypted data from contents
+        var iv = contents.slice(0, 16);
+        var encryptedData = contents.slice(16);
 
+        window.crypto.subtle.importKey(
+            "raw",
+            rawKey,
+            {name: "AES-CBC", length: 256},
+            true,
+            ["encrypt", "decrypt"]
+        ).then(function(key) {
+            window.crypto.subtle.decrypt(
+                {name: "AES-CBC", iv: iv},
+                key,
+                encryptedData
+            ).then(function(decrypted) {
+                var json = new TextDecoder().decode(new Uint8Array(decrypted));
+                try {
+                    // Parse the JSON to get an array of strings
+                    var stringArray = JSON.parse(json);
 
+                    // Convert the strings back to BigNumber instances
+                    valuesArray = stringArray.map(function(str) {
+                        return new BigNumber(str);
+                    });
 
+                    console.log("Array loaded successfully");
+                } catch(e) {
+                    console.error("Could not parse JSON file: ", e);
+                }
+            });
+        });
+    };
+    reader.readAsArrayBuffer(file);
+});
 
+            
+document.getElementById('saveEncButton').addEventListener('click', function() {
+    // Generate a random 256-bit key
+    var rawKey = window.crypto.getRandomValues(new Uint8Array(32));
+    // Convert key to base64 and show in keyField
+    document.getElementById('keyField').value = btoa(String.fromCharCode.apply(null, rawKey));
 
+    // Convert BigNumber instances to strings
+    var stringArray = valuesArray.map(function(bigNum) {
+        return bigNum.toString();
+    });
 
+    // Convert to JSON
+    var json = JSON.stringify(stringArray);
 
+    // Encode JSON as UTF-8
+    var encoder = new TextEncoder();
+    var data = encoder.encode(json);
+
+    // Generate random 128-bit IV
+    var iv = window.crypto.getRandomValues(new Uint8Array(16));
+
+    window.crypto.subtle.importKey(
+        "raw",
+        rawKey,
+        {name: "AES-CBC", length: 256},
+        true,
+        ["encrypt", "decrypt"]
+    ).then(function(key) {
+        window.crypto.subtle.encrypt(
+            {name: "AES-CBC", iv: iv},
+            key,
+            data
+        ).then(function(encrypted) {
+            // Concatenate IV and encrypted data
+            var contents = new Uint8Array(iv.length + encrypted.byteLength);
+            contents.set(new Uint8Array(iv), 0);
+            contents.set(new Uint8Array(encrypted), iv.length);
+
+            // Create a blob from the contents
+            var blob = new Blob([contents], {type: 'application/octet-stream'});
+
+            // Create an object URL for the blob
+            var url = URL.createObjectURL(blob);
+
+            // Create a link element
+            var a = document.createElement('a');
+
+            // Set the href and download attributes of the link
+            a.href = url;
+            a.download = 'encryptedPresets.json';
+
+            // Append the link to the body
+            document.body.appendChild(a);
+
+            // Simulate a click of the link
+            a.click();
+
+            // Remove the link from the body
+            document.body.removeChild(a);
+        });
+    });
+});
 
 
 
     
-
-
-  
 
 
 
