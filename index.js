@@ -495,70 +495,37 @@ document.getElementById('saveEncButton').addEventListener('click', function() {
     });
 });
 
-// Load JSON to valuesArray
 document.getElementById('loadEncButton').addEventListener('change', function(e) {
-    let file = e.target.files[0];
-    if (!file) return;
+  var file = e.target.files[0];
+  if (!file) return;
 
-    let reader = new FileReader();
-    reader.onload = function(e) {
-        let contents = e.target.result;
-        let keyString = document.getElementById('keyField').value;
-        let keydata = {
-            kty: "oct",
-            alg: "A256GCM",
-            k: keyString,
-            ext: true,
-            key_ops: ["encrypt", "decrypt"]
-        };
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    var contents = e.target.result;
+    var key = document.getElementById('keyField').value;
 
-        let base64 = contents.split(",")[1];
-        let raw = atob(base64);
-        let rawLength = raw.length;
-        let array = new Uint8Array(new ArrayBuffer(rawLength + 12));
-        let iv = array.subarray(0, 12);
-        let data = array.subarray(12);
+    try {
+      // Decrypt the encrypted JSON data using the key
+      var decryptedData = await decryptData(contents, key);
 
-        for(let i = 0; i < rawLength; i++) {
-            data[i] = raw.charCodeAt(i);
-        }
+      // Parse the decrypted JSON to get an array of strings
+      var stringArray = JSON.parse(decryptedData);
 
-        window.crypto.subtle.importKey(
-            "jwk",
-            keydata,
-            {
-                name: "AES-GCM",
-                length: 256
-            },
-            false,
-            ["encrypt", "decrypt"]
-        ).then(function(key) {
-            return window.crypto.subtle.decrypt(
-                {
-                    name: "AES-GCM",
-                    iv: iv
-                },
-                key,
-                data.buffer
-            );
-        }).then(function(decrypted){
-            let decoder = new TextDecoder();
-            let json = decoder.decode(decrypted);
-            // Parse the JSON to get an array of strings
-            let stringArray = JSON.parse(json);
+      // Convert the strings back to BigNumber instances
+      valuesArray = stringArray.map(function(str) {
+        return new BigNumber(str);
+      });
 
-            // Convert the strings back to BigNumber instances
-            valuesArray = stringArray.map(function(str) {
-                return new BigNumber(str);
-            });
-
-            console.log("Array loaded successfully");
-        }).catch(function(e){
-            console.error("Could not decrypt file: ", e);
-        });
-    };
-    reader.readAsDataURL(file);
+      console.log("Array loaded successfully");
+    } catch (e) {
+      console.error("Could not decrypt and parse JSON file: ", e);
+    }
+  };
+  reader.readAsText(file);
 });
+
+           
+
 
 
 
