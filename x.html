@@ -1,7 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>>
-<script src="https://cdn.jsdelivr.net/npm/ccapture.js"></script>
+
+
+
+
+  <title>Tezos Wallet Integration</title>
+  <!-- Include Taquito Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@taquito/taquito@7.6.0/dist/taquito.min.js"></script>
+<script>
+    // Connect to the Tezos network
+    const Tezos = new Taquito.TezosToolkit('https://tezos.example.com');
+
+    // Access wallet functionality
+    const wallet = Tezos.wallet;
+
+    // Implement wallet connection UI
+    const connectWalletBtn = document.getElementById('connectWalletBtn');
+    connectWalletBtn.addEventListener('click', async () => {
+      try {
+        // Connect the wallet
+        await wallet.connect();
+        console.log('Wallet connected successfully');
+        
+        // Retrieve user's address
+        const address = await wallet.pkh();
+        console.log('User address:', address);
+        
+        // Perform blockchain operations
+        // ... (your code here)
+      } catch (error) {
+        console.error('Error connecting wallet:', error);
+      }
+    });
+  </script>
+
+  
+
+
 
 
     <style>
@@ -163,12 +199,12 @@ document.body.appendChild(downloadBtn);
   
         
     </script>
-    <button id="start-button">Start Recording</button>
-<button id="stop-button">Stop Recording</button>
-<button id="save-button">Save as GIF</button>
+    
+  <h1>Tezos Wallet Integration</h1>
 
+  <button id="connectWalletBtn">Connect Wallet</button>
 
-
+  
 
     
 </body>
