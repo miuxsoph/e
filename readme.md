@@ -7,4 +7,4 @@ Visually, it does not look very good. Want to make it look better? Submit a pull
 
 
 
-This repository is a (more) portable clone of https://github.com/KeelyHill/tuppers-formula in which I have implemented the ability to store strings of states and save the resulting .json files using webcrypto.
+*** This repository is a (more) portable clone of https://github.com/KeelyHill/tuppers-formula in which I have implemented the ability to store state arrays as .json files using webcrypto to encrypt and generate a key to the resulting encrypted array. ***
