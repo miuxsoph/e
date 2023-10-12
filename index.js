@@ -1,6 +1,6 @@
 var src = $('#grid');
 var wrap = $('<div id="grid-overlay"></div>');
-var gsize = 8;
+var gsize = 10;
 var grid = 1802;
 
 // these are 1 less due to counting from 0
